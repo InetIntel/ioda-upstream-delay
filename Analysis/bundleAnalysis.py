@@ -51,45 +51,11 @@ Bundle change:
             If different, how does the difference look like
 """
 
-
-def calculate_bundle_changes_per_VP(snapshot_series):
-    common_bundle_prefixes_list = []  # To store common prefixes within bundles between consecutive snapshots
-
-    for i in range(len(snapshot_series) - 1):
-        snapshot1 = snapshot_series[i]
-        snapshot2 = snapshot_series[i + 1]
-
-        common_bundle_prefixes = {}  # To store common prefixes within bundles for snapshot i and i+1
-
-        common_as_numbers = set(snapshot1.keys()) & set(snapshot2.keys())
-
-        for as_number in common_as_numbers:
-            bundle_map1 = snapshot1[as_number]
-            bundle_map2 = snapshot2[as_number]
-            common_bundle_ids = set(bundle_map1.keys()) & set(bundle_map2.keys())
-
-            # Collect common prefixes within bundles for snapshot i and i+1
-            for bundle_id in common_bundle_ids:
-                prefixes1 = set(prefix for prefix, _ in bundle_map1[bundle_id])
-                prefixes2 = set(prefix for prefix, _ in bundle_map2[bundle_id])
-                if len(prefixes1) <= 1 or len(prefixes2) <= 1:
-                    continue
-                common_prefixes = prefixes1 & prefixes2
-
-                if common_prefixes:
-                    common_bundle_prefixes[bundle_id] = list(common_prefixes)
-
-        common_bundle_prefixes_list.append(common_bundle_prefixes)
-
-    return common_bundle_prefixes_list
-
-#TODO: I want to calculate the common prefixes in each bundle for each as first between the snapshots and during the iteration of snapshots, I also want to record all seen prefixes in each bundle for each as
-
 def calculate_bundle_changes_per_VP(snapshot_series):
     common_bundle_prefixes_list = []
     seen_bundle_prefixes = None 
     
-    for i in range(len(snapshot_series) - 1):
+    for i in range(len(snapshot_series)):
         if seen_bundle_prefixes is None:
             seen_bundle_prefixes = snapshot_series[i]
             continue
@@ -105,8 +71,8 @@ def calculate_bundle_changes_per_VP(snapshot_series):
             common_bundle_ids = set(bundle_map.keys()) & set(bundle_map_all.keys())
 
             for bundle_id in common_bundle_ids:
-                prefixes_curr = set(prefix for prefix, _ in bundle_map[bundle_id])
-                prefixes_all = set(prefix for prefix, _ in bundle_map_all[bundle_id])
+                prefixes_curr = set(prefix for prefix in bundle_map[bundle_id])
+                prefixes_all = set(prefix for prefix in bundle_map_all[bundle_id])
                 if len(prefixes_curr) <= 1 or len(prefixes_all) <= 1:
                     continue
                 common_prefixes = prefixes_curr & prefixes_all
@@ -115,7 +81,7 @@ def calculate_bundle_changes_per_VP(snapshot_series):
                     common_bundle_prefixes.setdefault(as_number, {})
                     common_bundle_prefixes[as_number][bundle_id] = list(common_prefixes)
 
-                    seen_bundle_prefixes.setdefault(as_number, {}).setdefault(bundle_id, set()).update(prefixes_curr)
+                    seen_bundle_prefixes.setdefault(as_number, {}).setdefault(bundle_id, set()).extend(prefixes_curr)
 
         common_bundle_prefixes_list.append(common_bundle_prefixes)
     
