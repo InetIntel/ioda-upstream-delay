@@ -3,10 +3,10 @@ import time
 
 count = 0
 with open("probe_input.txt") as file:
-    for line in file:
-        count = 0
-        while count < 6:
+    while count < 10:
+        for line in file:
             os.system('python3 run_json.py -r 100 ' + line.split()[0])
-            os.system('python3 run_trace.py' + line.split()[0])
-            count += 1 
+            print("Done Y")
+            print("Done N")
             time.sleep(1)
+        count += 1
