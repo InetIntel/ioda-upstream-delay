@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 
-def normal_trace(arg_st, ipm, dt):
+def normal_trace(arg_st, ipm, dt, id):
 
     os.system("traceroute " + arg_st +" > output.txt")
 
@@ -30,6 +30,7 @@ def normal_trace(arg_st, ipm, dt):
             pen_as = i
             break
 
+    header = { "index" : { "_index" : "normal_trace", "_id" : str(id) } }
     result_dict = {"src": {"ip" : ip_path[1],
                         "asn": as_path[1]},
                         "timestamp": dt,
@@ -46,5 +47,6 @@ def normal_trace(arg_st, ipm, dt):
     file_path = "test_results/" + arg_st +"N.json"
 
     with open(file_path, "w") as json_file:
+        json.dump(header, json_file)
         json.dump(result_dict, json_file)
     os.remove("output.txt")

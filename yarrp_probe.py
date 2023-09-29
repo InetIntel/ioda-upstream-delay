@@ -2,7 +2,7 @@ import json
 from normalTrace_probe import normal_trace 
 
 
-def yarrp_trace(dest_pfx, max_ttl, ipm, dt):
+def yarrp_trace(dest_pfx, max_ttl, ipm, dt, id):
 
     with open("temp.txt") as file:
         for line in file:
@@ -18,7 +18,7 @@ def yarrp_trace(dest_pfx, max_ttl, ipm, dt):
                 time = []
                 count = 0
 
-                normal_trace(dest_ip, ipm, dt)
+                normal_trace(dest_ip, ipm, dt, id)
             else:
 
                 ip_add.append(line[2:].strip().split()[0])
@@ -57,6 +57,7 @@ def yarrp_trace(dest_pfx, max_ttl, ipm, dt):
                     else:
                         latency = min(map(float, time[index+1:])) - float(time[index])
                         
+                    header = { "index" : { "_index" : "yarrp", "_id" : str(id) } }
                     result_dict = {"src": {"ip" : source_ip,
                             "asn": source_as},
                             "timestamp": dt,
@@ -72,6 +73,7 @@ def yarrp_trace(dest_pfx, max_ttl, ipm, dt):
                     file_path = "test_results/" + dest_ip + "Y.json"
 
                     with open(file_path, "w") as json_file:
+                        json.dump(header, json_file) 
                         json.dump(result_dict, json_file)   
                     return    
                 
