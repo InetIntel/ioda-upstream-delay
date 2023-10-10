@@ -11,8 +11,9 @@ dt = curr.strftime("%Y-%m-%dT%H:%M:%S")
 ipm = pyipmeta.IpMeta(providers=["pfx2as "
                                 "-f ./pyipmeta/CAIDA_Datasets/datasets/routeviews-rv2-20230403-1200.pfx2as.gz"])
 
-
+print(sys.argv)
 arg = sys.argv[1:]
+print(arg)
 arg = arg[:-1]
 c = sys.argv[-1]
 arg_st = " ".join(arg)
