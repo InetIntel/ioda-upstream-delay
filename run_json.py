@@ -12,7 +12,8 @@ ipm = pyipmeta.IpMeta(providers=["pfx2as "
                                 "-f ./pyipmeta/CAIDA_Datasets/datasets/routeviews-rv2-20230403-1200.pfx2as.gz"])
 
 
-arg = sys.argv[1:-1]
+arg = sys.argv[1:]
+arg = arg[::-1]
 c = sys.argv[-1]
 arg_st = " ".join(arg)
 dest_pfx = arg[-1]
