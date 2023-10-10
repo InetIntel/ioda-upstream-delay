@@ -13,7 +13,7 @@ ipm = pyipmeta.IpMeta(providers=["pfx2as "
 
 
 arg = sys.argv[1:]
-arg = arg[::-1]
+arg = arg[:-1]
 c = sys.argv[-1]
 arg_st = " ".join(arg)
 dest_pfx = arg[-1]
