@@ -23,6 +23,7 @@ out_warts = "output.warts"
 max_ttl = "16"
 
 arg_st = " ".join(arg)
+print("./yarrp " + "-o " + out_file + " " + arg_st)
 os.system("./yarrp " + "-o " + out_file + " " + arg_st)
 
 print("Yarrp Run Done")
@@ -36,7 +37,7 @@ process = subprocess.run(["sc_warts2text", out_warts], stdout = f)
 print("Process Done")
 f.close()
    
-yarrp_trace(dest_pfx, max_ttl, ipm, dt)
+yarrp_trace(dest_pfx, max_ttl, ipm, dt, c)
 
 os.remove("output.yrp")
 os.remove("output.warts")
