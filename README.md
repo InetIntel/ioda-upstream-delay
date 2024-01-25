@@ -16,3 +16,16 @@ To run the file, first create a `probe_input.txt` file with each line of the fil
 
 NOTE: `pyipmeta` is also required to run this project. 
 You also need to add the latest CAIDA pfx2AS dataset to the path `./pyipmeta/CAIDA_Datasets/datasets/{file}` to access the latest ASNs for the given prefixes.
+
+## Update
+
+The following files are important for yarrp:
+
+`as_list_test.txt`: Text file with 1 target AS on each line
+`prefix_list_test.txt`: Text file with 1 target prefix on each line
+`get_ip_list.py`: Gets the ip address from the prefix list using prefix2ip.json
+`get_prefix_list`: Gets the prefix from the AS list using as2prefix.json
+`probe.py`: Starting point of yarrp - need to run this using python3 probe.py -i <input list name> -t <type of input list: A/P> -r <probe rate>
+`optimized_ip.txt`: Final list of ip addresses that will be fed into yarrp
+`run_json.py`: Runs yarrp and gets the resulting .txt file - also calls yarrp_probe.py to format the received output and makes the post request to elasticsearch
+`yarrp_probe.py`: Parses the output into individual json files based on the AS
