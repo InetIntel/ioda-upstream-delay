@@ -36,3 +36,5 @@ The following files are important for yarrp:
 `run_json.py`: Runs yarrp and gets the resulting .txt file - also calls yarrp_probe.py to format the received output and makes the post request to elasticsearch
 
 `yarrp_probe.py`: Parses the output into individual json files based on the AS
+
+`elastic_codes.py`: Has all the functions required to work with elasticsearch
