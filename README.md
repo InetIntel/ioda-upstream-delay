@@ -19,6 +19,8 @@ You also need to add the latest CAIDA pfx2AS dataset to the path `./pyipmeta/CAI
 
 ## Update
 
+!(Image)[pipeline.png]
+
 The following files are important for yarrp:
 
 `as_list_test.txt`: Text file with 1 target AS on each line
