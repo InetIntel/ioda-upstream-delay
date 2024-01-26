@@ -53,7 +53,7 @@ for file_name in files:
     file_path = "test_results/" + file_name
     post_elastic(file_path)
 
-retrieve_document("yarrp", "2571")
+#retrieve_document("yarrp", "2571")
 
 
 
