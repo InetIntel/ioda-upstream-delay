@@ -62,31 +62,39 @@ def post_elastic(file_path):
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
     ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
-    get_response = requests.get(f"{elasticsearch_url}/{index_name}/_doc/{document_id}") #check if the document_id already exists
+    auth = (username, password)
+
+    #get_response =et(f"{elasticsearch_url}/{index_name}/_doc/{document_id}", auth=auth, verify=ca_cert_p #check if the document_id already exists
     # Read the JSON data from your file
     with open(file_path, 'r') as json_file:
         for line in json_file:
             json_data = json.loads(line)
+
+            get_response = requests.get(f"{elasticsearch_url}/{index_name}/_doc/{document_id}", auth=auth, verify=ca_cert_path)
              
             if get_response.status_code == 200:
                 existing_data = get_response.json()['_source']
+                #print(existing_data)
 
                 # Merge the existing data with the new data
-                updated_data = {**existing_data, **json_data}
+                existing_data[json_data["dest"]["ip"] +"_"+ json_data["timestamp"]]  = json_data
+                #print(existing_data)
 
                 # Use the Update API to update the document
-                update_data = {
-                    "doc": updated_data,
+                updated_data = {
+                    "doc" : existing_data,
                     "doc_as_upsert": False  # Do not create the document if it doesn't exist
                 }   
 
+                auth = (username, password)
+
                 update_response = requests.post(
-                f"{elasticsearch_url}/{index_name}/_doc/{document_id}/_update",
+                f"{elasticsearch_url}/{index_name}/_update/{document_id}",
                 headers={'Content-Type': 'application/json'},
-                data=json.dumps(update_data)
+                data=json.dumps(updated_data),auth=auth, verify=ca_cert_path
                 )
 
-                if update_response.status_code == 200:
+                if update_response.status_code == 200 or response.status_code == 201:
                     print("Document updated successfully.")
                 else:
                     print(f"Failed to update document. Response status code: {update_response.status_code}")
@@ -104,9 +112,10 @@ def post_elastic(file_path):
                 # Set the headers to specify that you're sending JSON data and include authentication
                 headers = {'Content-Type': 'application/json'}
                 auth = (username, password)
+                data = {json_data["dest"]["ip"] + "_" + json_data["timestamp"] : json_data}
 
                 # Send a POST request to upload the JSON data to Elasticsearch with authentication and SSL verification
-                response = requests.post(url, data=json.dumps(json_data), headers=headers, auth=auth, verify=ca_cert_path)
+                response = requests.post(url, data=json.dumps(data), headers=headers, auth=auth, verify=ca_cert_path)
 
                 # Check the response from Elasticsearch
                 if response.status_code == 201 or response.status_code == 200:
@@ -117,15 +126,20 @@ def post_elastic(file_path):
 
 def delete_elastic_index():
     # Define the Elasticsearch server URL and index name
-    elasticsearch_url = 'http://localhost:9200'  # Replace with the correct URL
+    elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
     index_name = 'yarrp'  # Replace with the index where you want to delete documents
+    username = 'elastic'  # Replace with your Elasticsearch username
+    password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
+    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+
+    auth = (username, password)
 
 
     # Create the Elasticsearch document URL
     url = f'{elasticsearch_url}/{index_name}'
 
     # Send a DELETE request to delete the document
-    response = requests.delete(url)
+    response = requests.delete(url, auth=auth, verify=ca_cert_path)
 
     # Check the response from Elasticsearch
     if response.status_code == 200:
@@ -135,7 +149,8 @@ def delete_elastic_index():
     else:
         print(f"Failed to delete the index. Response status code: {response.status_code}")
         print(response.text)
-
+#delete_elastic_index()
 #create_index("yarrp")
-#post_elastic("../test_results/8Y.json")
-#retrieve_document("yarrp", "8")
+#post_elastic("../test_results/2571Y.json")
+#retrieve_document("yarrp", "2571")
+#delete_elastic_index()
