@@ -1,13 +1,54 @@
 import json
 import requests
+from elasticsearch import Elasticsearch
 
+def retrieve_specific_fields(index_name, document_id):
+    es = Elasticsearch(['https://localhost:9200'], basic_auth=('elastic', 'NXGQfMtUJzaF0k6FiY5K'), ca_certs="../../../elasticsearch-8.10.2/config/certs/http_ca.crt")
+
+    # Specify the fields you want to retrieve
+    query = {
+        "_source": [],
+        "query": {
+            "match": {
+                "_id": document_id
+            }
+        }
+    }
+
+    # Execute the Elasticsearch query
+    response = es.search(index=index_name, body=query)
+    extracted_data = {}
+
+    # Extract the specific fields from the Elasticsearch response
+    for hit in response['hits']['hits']:
+        source = hit['_source']  # Accessing the nested _source field
+        for ip_key, ip_data in source.items():
+            penultimate_asn = ip_data.get('penultimate_asn', None)
+            latency = ip_data.get('latency', None)
+            dest = ip_data.get('dest', None)
+            src = ip_data.get('src', None)
+
+            # Store the extracted values as a dictionary with ip_key as the key
+            extracted_data[ip_key] = {
+                "Penultimate ASN": penultimate_asn,
+                "Latency": latency,
+                "Destination": dest,
+                "Source": src
+            }
+
+    output_file_path = f"imp_data_{document_id}.json"
+    with open(output_file_path, "w") as f:
+        json.dump(extracted_data, f, indent=4)
+
+# Example usage:
+retrieve_specific_fields("yarrp", "2571")
 
 def retrieve_document(index_name, document_id):
 
     elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
 
     url = f'{elasticsearch_url}/{index_name}/_doc/{document_id}'
@@ -18,7 +59,9 @@ def retrieve_document(index_name, document_id):
     if response.status_code == 200:
         document = response.json()
         print(f"Retrieved document with ID {document_id}:")
-        print(json.dumps(document, indent=2))
+        #print(json.dumps(document, indent=2))
+        with open(f"document_{document_id}.json", "w") as outfile:
+            json.dump(document, outfile, indent=2)
     elif response.status_code == 404:
         print(f"Document with ID {document_id} not found.")
     else:
@@ -37,7 +80,7 @@ def create_index(index_name):
     # file_path = ""  # Replace with the path to your JSON file
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
 
     url = f'{elasticsearch_url}/{index_name}'
@@ -57,7 +100,7 @@ def post_elastic(file_path):
     index_name = 'yarrp'  # Replace with the desired index name
     document_id = file_path.split("/")[-1].split(".")[0][:-1]  # Replace with the desired document ID (or omit for auto-generation)
     # file_path = ""  # Replace with the path to your JSON file
-    print(document_id)
+    # print(document_id)
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
     ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
@@ -94,8 +137,9 @@ def post_elastic(file_path):
                 data=json.dumps(updated_data),auth=auth, verify=ca_cert_path
                 )
 
-                if update_response.status_code == 200 or response.status_code == 201:
-                    print("Document updated successfully.")
+                if update_response.status_code == 200 or update_response.status_code == 201:
+                    #print("Document updated successfully.")
+                    pass
                 else:
                     print(f"Failed to update document. Response status code: {update_response.status_code}")
                     print(update_response.text)
@@ -119,7 +163,8 @@ def post_elastic(file_path):
 
                 # Check the response from Elasticsearch
                 if response.status_code == 201 or response.status_code == 200:
-                    print("Data successfully uploaded to Elasticsearch.")
+                    #print("Data successfully uploaded to Elasticsearch.")
+                    pass
                 else:
                     print(f"Failed to upload data. Response status code: {response.status_code}")
                     print(response.text)
@@ -130,7 +175,7 @@ def delete_elastic_index():
     index_name = 'yarrp'  # Replace with the index where you want to delete documents
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
     auth = (username, password)
 
@@ -154,3 +199,4 @@ def delete_elastic_index():
 #post_elastic("../test_results/2571Y.json")
 #retrieve_document("yarrp", "2571")
 #delete_elastic_index()
+#retrieve_specific_fields("yarrp", "2571")
