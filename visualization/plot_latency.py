@@ -1,6 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import pandas as pd
+from elastic.elastic_codes import *
 
 def plot_latency_by_penultimate_asn(ASN):
     # Load data from JSON file
@@ -38,5 +39,6 @@ def plot_latency_by_penultimate_asn(ASN):
         plt.legend(title='Penultimate ASN')
         plt.show()
 
-# Example usage:
-plot_latency_by_penultimate_asn("2571")
+ASN = "2571"
+retrieve_specific_fields("yarrp", ASN)
+plot_latency_by_penultimate_asn(ASN)

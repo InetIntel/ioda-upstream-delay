@@ -40,9 +40,6 @@ def retrieve_specific_fields(index_name, document_id):
     with open(output_file_path, "w") as f:
         json.dump(extracted_data, f, indent=4)
 
-# Example usage:
-retrieve_specific_fields("yarrp", "2571")
-
 def retrieve_document(index_name, document_id):
 
     elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
