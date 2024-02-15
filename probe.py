@@ -20,17 +20,14 @@ def run_probe(input_file, input_type, probe_rate):
             count_total = 0
             count_iter = 0
 
-            while count_total < 1:
-                count_iter = 0
-                while count_iter < 1:
-                    count = count_total * 1 + count_iter
-                    os.system(f'python3 run_json.py -r {rate} -n 5 -i optimized_ip.txt {count}')
-                    print("Done")
-                    time.sleep(1)
-                    count_iter += 1
+            while True:
+                count = count_total * 1 + count_iter
+                os.system(f'python3 run_json.py -r {rate} -n 5 -i optimized_ip.txt {count}')
+                # print("Done")
+                time.sleep(1)
                 count_total += 1
                 # Sleep for 10 seconds
-                time.sleep(10)
+                time.sleep(1800)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the probe script.")

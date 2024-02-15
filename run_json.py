@@ -6,6 +6,7 @@ import os
 from yarrp_probe import yarrp_trace
 import time
 from elastic.elastic_codes import create_index, post_elastic, retrieve_document
+import shutil
 
 curr = datetime.now()
 dt = curr.strftime("%Y-%m-%dT%H:%M:%S")
@@ -22,7 +23,7 @@ arg_st = " ".join(arg)
 out_file = "output.yrp"
 out_warts = "output.warts"
 
-max_ttl = "16"
+max_ttl = "32"
 
 arg_st = " ".join(arg)
 print("./yarrp " + "-o " + out_file + " -m " +max_ttl + " " +  arg_st)
@@ -39,7 +40,11 @@ f = open("temp.txt", "w")
 process = subprocess.run(["sc_warts2text", out_warts], stdout = f)
 #print("Process Done")
 f.close()
-   
+
+
+shutil.rmtree('test_results')
+os.mkdir("test_results")
+
 yarrp_trace(max_ttl, ipm, dt, False)
 os.remove("output.yrp")
 os.remove("output.warts")
@@ -47,13 +52,13 @@ os.remove("temp.txt")
 #create_index("yarrp")
 
 files = [f for f in os.listdir("test_results") if os.path.isfile(os.path.join("test_results", f))]
-
+#print(files)
     # Iterate through the files and send them to post_elastic
 for file_name in files:
     file_path = "test_results/" + file_name
+    print(file_path)
     post_elastic(file_path)
 
 #retrieve_document("yarrp", "2571")
-
-
-
+#os.rmdir("test_results")
+#os.mkdir("test_results")

@@ -5,7 +5,14 @@ d_all = {}
 d_kafka = {}
 def yarrp_trace(max_ttl, ipm, dt, kafka_store):
     with open("temp.txt") as file:
-        for line in file:
+        lines =  file.read().splitlines()
+        for line_idx in range(len(lines)):
+            line = lines[line_idx]
+            if line_idx!=len(lines)-1:
+                next_line = lines[line_idx+1]
+            else:
+                next_line = None
+
             if line.startswith('t'):
                 dest_ip = line.strip().split()[-1]
                 dest_pfx = '.'.join(dest_ip.split(".")[:-1] + ['0']) + '/24'
@@ -13,6 +20,7 @@ def yarrp_trace(max_ttl, ipm, dt, kafka_store):
                 dest_as = dest_as[0]["asns"] if dest_as else ""
                 source_ip = line.strip().split()[2]
                 source_as = ipm.lookup(source_ip)[0]["asns"]
+                #print(dest_as)
 
                 ip_add = []
                 time = []
@@ -26,7 +34,7 @@ def yarrp_trace(max_ttl, ipm, dt, kafka_store):
                 ip_add.append(ip)
                 time.append("N/A" if ip == '*' else t)
 
-                if len(ip_add) == int(max_ttl):
+                if len(ip_add) == int(max_ttl) or (next_line and next_line.startswith('t')):
                     asn = [str(ipm.lookup(ip)[0]["asns"][0]) if (ip != '*' and ipm.lookup(ip)) else "N/A" for ip in ip_add]
 
                     while len(asn) < int(max_ttl):
@@ -100,6 +108,8 @@ def yarrp_trace(max_ttl, ipm, dt, kafka_store):
                             "as_path": asn,
                             "type": "YT"
                         }
+                        #print("here")
+                        #print(result_dict)
 
                         
                         file_path = f"test_results/{dest_as[0]}Y.json"
