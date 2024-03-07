@@ -7,8 +7,7 @@ def retrieve_specific_fields(index_name, document_id):
     elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
-
+    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
     url = f'{elasticsearch_url}/{index_name}/_doc/{document_id}'
     headers = {'Content-Type': 'application/json'}
@@ -46,7 +45,7 @@ def retrieve_document(index_name, document_id):
     elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
 
     url = f'{elasticsearch_url}/{index_name}/_doc/{document_id}'
@@ -78,7 +77,7 @@ def create_index(index_name):
     # file_path = ""  # Replace with the path to your JSON file
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
 
     url = f'{elasticsearch_url}/{index_name}'
@@ -177,7 +176,7 @@ def delete_elastic_index():
     index_name = 'yarrp'  # Replace with the index where you want to delete documents
     username = 'elastic'  # Replace with your Elasticsearch username
     password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
-    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
+    ca_cert_path = '../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
     auth = (username, password)
 
