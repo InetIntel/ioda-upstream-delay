@@ -3,38 +3,39 @@ import requests
 from elasticsearch import Elasticsearch
 
 def retrieve_specific_fields(index_name, document_id):
-    es = Elasticsearch(['https://localhost:9200'], basic_auth=('elastic', 'NXGQfMtUJzaF0k6FiY5K'), ca_certs="../../../elasticsearch-8.10.2/config/certs/http_ca.crt")
+    
+    elasticsearch_url = 'https://localhost:9200'  # Replace with the correct URL
+    username = 'elastic'  # Replace with your Elasticsearch username
+    password = 'NXGQfMtUJzaF0k6FiY5K'  # Replace with your Elasticsearch password
+    ca_cert_path = '../../../elasticsearch-8.10.2/config/certs/http_ca.crt'  # Replace with the path to your CA certificate
 
-    # Specify the fields you want to retrieve
-    query = {
-        "_source": [],
-        "query": {
-            "match": {
-                "_id": document_id
-            }
-        }
-    }
 
-    # Execute the Elasticsearch query
-    response = es.search(index=index_name, body=query)
-    extracted_data = {}
+    url = f'{elasticsearch_url}/{index_name}/_doc/{document_id}'
+    headers = {'Content-Type': 'application/json'}
+    auth = (username, password)
+    response = requests.get(url, headers=headers, auth=auth, verify=ca_cert_path)
 
-    # Extract the specific fields from the Elasticsearch response
-    for hit in response['hits']['hits']:
-        source = hit['_source']  # Accessing the nested _source field
-        for ip_key, ip_data in source.items():
-            penultimate_asn = ip_data.get('penultimate_asn', None)
-            latency = ip_data.get('latency', None)
-            dest = ip_data.get('dest', None)
-            src = ip_data.get('src', None)
+    if response.status_code == 200:
+            response_json = response.json()
+            extracted_data = {}
+            source = response_json['_source']["items"]  # Accessing the nested _source field
+            for ip_data in source:
+                penultimate_asn = ip_data.get('penultimate_asn', None)
+                latency = ip_data.get('latency', None)
+                dest = ip_data.get('dest', None)
+                src = ip_data.get('src', None)
+                timestamp = ip_data.get("timestamp",None)
 
-            # Store the extracted values as a dictionary with ip_key as the key
-            extracted_data[ip_key] = {
-                "Penultimate ASN": penultimate_asn,
-                "Latency": latency,
-                "Destination": dest,
-                "Source": src
-            }
+                ip_key = ip_data["key"]
+
+                # Store the extracted values as a dictionary with ip_key as the key
+                extracted_data[ip_key] = {
+                    "Penultimate ASN": penultimate_asn,
+                    "Latency": latency,
+                    "Destination": dest,
+                    "Source": src,
+                    "Timestamp": timestamp
+                }
 
     output_file_path = f"imp_data_{document_id}.json"
     with open(output_file_path, "w") as f:
@@ -113,7 +114,7 @@ def post_elastic(file_path):
             get_response = requests.get(f"{elasticsearch_url}/{index_name}/_doc/{document_id}", auth=auth, verify=ca_cert_path)
              
             if get_response.status_code == 200:
-                existing_data = get_response.json()['_source']
+                existing_data = get_response.json()['_source']["items"]
                 #print(existing_data)
 
                 # Merge the existing data with the new data
@@ -124,7 +125,7 @@ def post_elastic(file_path):
 
                 # Use the Update API to update the document
                 updated_data = {
-                    "doc" : existing_data,
+                        "doc" : {"items": existing_data},
                     "doc_as_upsert": False  # Do not create the document if it doesn't exist
                 }   
 
@@ -137,7 +138,7 @@ def post_elastic(file_path):
                 )
 
                 if update_response.status_code == 200 or update_response.status_code == 201:
-                    #print("Document updated successfully.")
+                    print("Document updated successfully.")
                     pass
                 else:
                     print(f"Failed to update document. Response status code: {update_response.status_code}")
@@ -157,14 +158,14 @@ def post_elastic(file_path):
                 auth = (username, password)
                 key = json_data["dest"]["ip"] + "_" + json_data["timestamp"]
                 json_data["key"] = key
-                data = {[json_data]}
+                data = {"items":[json_data]}
 
                 # Send a POST request to upload the JSON data to Elasticsearch with authentication and SSL verification
                 response = requests.post(url, data=json.dumps(data), headers=headers, auth=auth, verify=ca_cert_path)
 
                 # Check the response from Elasticsearch
                 if response.status_code == 201 or response.status_code == 200:
-                    #print("Data successfully uploaded to Elasticsearch.")
+                    print("Data successfully uploaded to Elasticsearch.")
                     pass
                 else:
                     print(f"Failed to upload data. Response status code: {response.status_code}")
