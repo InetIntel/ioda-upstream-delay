@@ -117,7 +117,9 @@ def post_elastic(file_path):
                 #print(existing_data)
 
                 # Merge the existing data with the new data
-                existing_data[json_data["dest"]["ip"] +"_"+ json_data["timestamp"]]  = json_data
+                key = json_data["dest"]["ip"] + "_" + json_data["timestamp"]
+                json_data["key"] = key
+                existing_data.append(json_data)
                 #print(existing_data)
 
                 # Use the Update API to update the document
@@ -153,7 +155,9 @@ def post_elastic(file_path):
                 # Set the headers to specify that you're sending JSON data and include authentication
                 headers = {'Content-Type': 'application/json'}
                 auth = (username, password)
-                data = {json_data["dest"]["ip"] + "_" + json_data["timestamp"] : json_data}
+                key = json_data["dest"]["ip"] + "_" + json_data["timestamp"]
+                json_data["key"] = key
+                data = {[json_data]}
 
                 # Send a POST request to upload the JSON data to Elasticsearch with authentication and SSL verification
                 response = requests.post(url, data=json.dumps(data), headers=headers, auth=auth, verify=ca_cert_path)
