@@ -1,5 +1,4 @@
 import json
-from normalTrace_probe import normal_trace
 
 d_all = {}
 d_kafka = {}

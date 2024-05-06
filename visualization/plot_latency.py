@@ -1,6 +1,9 @@
 import json
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
+sys.path.append('../')
 from elastic.elastic_codes import *
 
 def plot_latency_by_penultimate_asn(ASN):
@@ -24,6 +27,8 @@ def plot_latency_by_penultimate_asn(ASN):
         else:
             dfs_by_ip[dest_ip]['latencies'].append(value['Latency'])
 
+    # print(dfs_by_ip)
+
     # Create and display plots for each destination IP
     for dest_ip, data_dict in dfs_by_ip.items():
         df = pd.DataFrame(data_dict)
@@ -40,5 +45,7 @@ def plot_latency_by_penultimate_asn(ASN):
         plt.show()
 
 ASN = "2571"
-retrieve_specific_fields("yarrp", ASN)
+file_path = f"imp_data_{ASN}.json"
+if not os.path.exists(file_path):
+    retrieve_specific_fields("yarrp", ASN)
 plot_latency_by_penultimate_asn(ASN)
